@@ -108,6 +108,7 @@ if ( !$infile ) {
     print_dedicated_ipaddrs();
     print_mysql_db_count();
     print_postgres_db_count();
+    check_destination_var_usage();
     print_bad_usernames();
     print_duplicate_usernames();
     print_custom_apache_modules();
@@ -205,6 +206,25 @@ sub check_for_empty_trueuserdomains {
         if ( -f '/etc/trueuserdomains' and -z '/etc/trueuserdomains' ) {
             die "/etc/trueuserdomains exists, but is empty!";
         }
+    }
+}
+
+sub check_destination_var_usage {
+    return if $is_cpanel == 0;
+
+    my $var_usage;
+    open my $df_fh, '-|', '/bin/df', '-h', '/var';
+    while ( <$df_fh> ) {
+        # Filesystem            Size  Used Avail Use% Mounted on
+        # /dev/simfs             20G  6.2G   14G  31% /
+        if ( m# \A /(?:\S+) \s+ ([0-9A-Z\.]+) \s+ ([0-9A-Z\.]+) \s+ ([0-9A-Z\.]+) \s+ ([0-9]+)% \s+ (\S+) #xms ) {
+            $var_usage = "[Size: $1] [Used: $2] [Avail: $3] [Use%: $4] [Mount point: $5]\n";
+        }
+    }
+    close $df_fh;
+
+    if ($var_usage) {
+        print_format( '/var:', $var_usage );
     }
 }
 
@@ -452,7 +472,7 @@ sub print_os_info {
 sub print_format {
     my ( $str1, $str2 ) = @_;
     format =
-@>>>>>>>>>>>>>>>>>>>> @< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+@>>>>>>>>>>>>>>>>>>>> @< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $str1, ':', $str2
 .
 
