@@ -224,7 +224,7 @@ sub check_destination_var_usage {
     close $df_fh;
 
     if ($var_usage) {
-        print_format( '/var:', $var_usage );
+        print_format( '/var', $var_usage );
     }
 }
 
@@ -1344,7 +1344,7 @@ sub print_prefixed_bad_username_info {
             open my $userdomains_fh, '<', '/etc/trueuserdomains' or die "Could not open /etc/trueuserdomains: $!\n";
             while ( <$userdomains_fh> ) {
                 chomp;
-                if ( m{ [^:]: \s (.*[\-\._]|test|[0-9]) }xms ) {
+                if ( m{ [^:]: \s (.*[\-\._]|test|[0-9]|[A-Z]) }xms ) {
                     print $prefix . 'BADUSER:' . "$_\n";
                 }
             }
