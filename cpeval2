@@ -1160,9 +1160,19 @@ sub print_custom_php_modules {
     foreach (@mods) {
         my $mod = $_;
         push( @custom, " " . $mod . "\n" ) unless grep ( /^$mod$/, @base );
-    }   
+    }
+
+    ## TTF (FreeType) check
+    my $freetype = `php -i 2>/dev/null | grep -i 'freetype support => enabled'`;
+    if ($freetype) {
+        push @custom, ' TTF (FreeType)';
+    }
+
     if ( !@custom ) { 
         push( @custom, " -None-\n" );
+    }
+    else {
+        @custom = sort @custom;
     }   
 
     print "Custom PHP Modules:\n";
