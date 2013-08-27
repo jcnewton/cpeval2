@@ -86,11 +86,25 @@ verify_mysql_connectivity();
 
 sub print_news {
     print q{
-Last updated: August 26th, 2013
 ===============================
-1. [FB 75761] Until the fix for case 75761 is pushed, please use the override for ALL Plesk migrations. The override can be found in the case.
+LIST OF CRITICAL BUGS THAT PREVENT PROPER TRANSFERS
+Last updated: August 27th, 2013
+===============================
 
-2. [FB 75865] Not all Plesk addon domains are copied. There is currently no workaround.
+-------------------------------
+1. [FB 75761] 08/20/2013 Plesk: Not all files/dirs starting with a number are copied.
+- Workaround? YES. Use the override for ALL Plesk transfers! See case for override.
+
+2. [FB 75865] 08/21/2013 Plesk: Not all Plesk addon domains are copied.
+- Workaround? NO.
+
+3. [FB 69649] 06/04/2013 DirectAdmin: Not all email accounts are copied.
+- Workaround? NO. Customers can create any missing email accounts and copy their email.
+
+4. [FB 73781] 07/23/2013 Ensim: Subdomain data is not always copied correctly.
+- Workaround? NO.
+-------------------------------
+
 };
 
     sleep 3;
