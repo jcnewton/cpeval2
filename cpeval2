@@ -99,7 +99,7 @@ Last updated: August 27th, 2013
 - Workaround? NO.
 
 3. [FB 69649] 06/04/2013 DirectAdmin: Not all email accounts are copied.
-- Workaround? NO. Customers can create any missing email accounts and copy their email.
+- Workaround? NO.
 
 4. [FB 73781] 07/23/2013 Ensim: Subdomain data is not always copied correctly.
 - Workaround? NO.
