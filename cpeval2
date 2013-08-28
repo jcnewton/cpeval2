@@ -1733,7 +1733,7 @@ sub print_parsed_php_info {
                 $print_message = 1;
                 $addendum  = "The versions of PHP do not match. This is ok, but some sites may not be compatible with different versions of PHP.\n\n";
                 $addendum .= "cPanel supports PHP 5.2, 5.3, and  5.4 at this time.\n\n";
-                $addendum .= "For maximum compatibility, I would recommend downgrading PHP 5.3 on the cPanel server. This is not required, however.\n\n";
+                $addendum .= "For maximum compatibility, I would recommend downgrading to PHP 5.3 on the cPanel server. This is not required, however.\n\n";
                 $addendum .= "Would you like us to downgrade PHP on the cPanel server to ${src_php}?\n\n";
                 $addendum .= "[ ] YES   [ ] NO\n";
             }
@@ -1741,7 +1741,7 @@ sub print_parsed_php_info {
                 $print_message = 1;
                 $addendum  = "The versions of PHP do not match. This is ok, but some sites may not be compatible with different versions of PHP.\n\n";
                 $addendum .= "cPanel supports PHP 5.2, 5.3, and  5.4 at this time.\n\n";
-                $addendum .= "For maximum compatibility, I would recommend downgrading PHP 5.2 on the cPanel server. This is not required, however.\n\n";
+                $addendum .= "For maximum compatibility, I would recommend downgrading to PHP 5.2 on the cPanel server. This is not required, however.\n\n";
                 $addendum .= "Would you like us to downgrade PHP on the cPanel server to ${src_php}?\n\n";
                 $addendum .= "[ ] YES   [ ] NO\n";
             }
