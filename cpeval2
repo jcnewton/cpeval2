@@ -938,15 +938,15 @@ sub print_postgres_db_count {
                 print_format( 'Postgres DBs', @alldbs . " (" . @userdbs . " User Created)" );
             }
             else {
-                print 'Postgres DBs: ' . "Installed & Running; Not Configured\n";
+                print_format( 'Postgres DBs', 'Installed & running; not configured' );
             }
         }
         else {
-            print 'Postgres DBs: ' . "Installed; Not Running\n";
+            print_format( 'Postgres DBs', 'Installed; not running' );
         }
     }   
     else {
-        print 'Postgres DBs: ' . "Not Installed\n";
+        print_format( 'Postgres DBs', 'Not installed' );
     }   
 }
 
