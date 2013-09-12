@@ -86,10 +86,10 @@ verify_mysql_connectivity();
 
 sub print_news {
     print q{
-    =========================================================
-    LIST OF CRITICAL BUGS THAT PREVENT PROPER TRANSFERS
+    =======================================================
+      LIST OF CRITICAL BUGS THAT PREVENT PROPER TRANSFERS
              Last updated: September 11th, 2013
-    =========================================================
+    =======================================================
 
     !! USE _DEVEL OVERRIDE FOR ALL PLESK AND DA TRANSFERS !!
 
@@ -1282,38 +1282,6 @@ sub print_duplicate_usernames {
     print "Duplicate Usernames:\n" . "$result";
 }
 
-sub dumpurl {
-    my $url = shift;
-    my ( $rdrfh, $bin, $flag, $pid, $dump );
-
-    if ( $bin = _find_bin( 'lwp-request' ) ) {
-        undef $flag;
-    }   
-    elsif ( $bin = _find_bin( 'lynx' ) ) { 
-        $flag = '-dump';
-    }   
-    elsif ( $bin = _find_bin( 'curl' ) ) { 
-        $flag = '-s';
-    }   
-    else {
-        ## TODO: don't die() here; print warning instead
-        die 'Unable to locate lwp-request, curl, or lynx';
-    }   
-
-    if ($flag) {
-        $pid = IPC::Open3::open3( undef, $rdrfh, undef, $bin, $flag, $url );
-    }   
-    else {
-        $pid = IPC::Open3::open3( undef, $rdrfh, undef, $bin, $url );
-    }   
-    local $/; 
-    $dump = readline($rdrfh);
-    waitpid( $pid, 0 );
-
-    s/^\s+//, s/\s+$// for $dump;
-    return $dump;
-}
-
 sub _find_bin {
     my $bin = shift;
 
@@ -1884,24 +1852,6 @@ sub print_parsed_ipaddr_info {
         print "[ ] YES   [ ] NO\n";
     }
 }
-
-sub print_parsed_disk_usage_info {
-    my ( $src_disk_usage, $dst_disk_usage ) = @_;
-    my @src_disk_usage = @$src_disk_usage;
-    my @dst_disk_usage = @$dst_disk_usage;
-
-    if ( ( scalar @src_disk_usage ) == 1 ) {
-        for my $line ( @src_disk_usage ) {
-            $line =~ s/.*E://g;
-            my ( $src_disk_used, $src_disk_available, $src_partition ) = split /:/, $line;
-            if ( $src_disk_used > $src_disk_available ) {
-                print "$src_panel_noversion is using more disk space than what is available\n";
-            }
-        }
-    }
-}
-
-
 
 sub print_parsed_forwarding_domain_info {
     my %forwarding_domains = @_;
