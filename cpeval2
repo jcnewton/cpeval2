@@ -58,8 +58,9 @@ if ( @ARGV > 1 ) {
     exit;
 }
 
-print_news();
+#print_news();
 
+my $supported_php_versions = '5.2, 5.3, 5.4, and 5.5';
 my $panel_regex = 's:(?:Plesk(?:8|9|10|10SMB|11)|Ensim|DirectAdmin)';
 
 my $infile = shift;
@@ -1592,40 +1593,41 @@ sub print_parsed_php_info {
     ## if source and dest are both PHP 5
     elsif ( $src_php_major == 5 and $dst_php_major == 5 ) {
         ## if source PHP 5 is lower than dest PHP 5
-        if ( $src_php_minor < 3 and $dst_php_minor > 2 ) {
+        if ( $src_php_minor <= 2  and $dst_php_minor > 2 ) {
             $print_message = 1;
             $addendum  = "The versions of PHP do not match. This is ok, but some sites may not be compatible with different versions of PHP.\n\n";
-            $addendum .= "cPanel supports PHP 5.2, 5.3, and  5.4 at this time.\n\n";
+            $addendum .= "cPanel supports PHP $supported_php_versions at this time.\n\n";
             $addendum .= "For maximum compatibility, I would recommend downgrading to PHP 5.2 on the cPanel server. This is not required, however.\n\n";
             $addendum .= "Would you like us to downgrade PHP on the cPanel server to 5.2?\n\n";
             $addendum .= "[ ] YES   [ ] NO\n";
         }
-        ## cPanel supports PHP 5.4, but no higher
-        elsif ( $src_php_minor > 4 and $dst_php_minor < 4 ) {
+        ## cPanel supports PHP 5.5, but no higher
+        elsif ( $src_php_minor > 5 and $dst_php_minor < 5 ) {
             $print_message = 1;
             $addendum  = "The $src_panel_noversion server is using PHP ${src_php}.\n\n";
-            $addendum .= "cPanel currently supports PHP 5.2, 5.3, and 5.4.\n\n";
-            $addendum .= "For maximum compatibility, I would recommend ugrading to PHP 5.4 on the cPanel server. This is not required, however.\n\n";
-            $addendum .= "Would you like us to upgrade PHP on the cPanel server to 5.4?\n\n";
+            $addendum .= "cPanel currently supports PHP ${supported_php_versions}.\n\n";
+            $addendum .= "For maximum compatibility, I would recommend ugrading to PHP 5.5 on the cPanel server. This is not required, however.\n\n";
+            $addendum .= "Would you like us to upgrade PHP on the cPanel server to 5.5?\n\n";
             $addendum .= "[ ] YES   [ ] NO\n";
         }
-        elsif ( $src_php_minor > 4 and $dst_php_minor == 4 ) {
+        ## source exceeds max supported PHP version
+        elsif ( $src_php_minor > 5 and $dst_php_minor == 5 ) {
             $print_message = 1;
-            $addendum = "cPanel only supports up to PHP 5.4 at this time. Since we cannot change the version of PHP to match that of the $src_panel_noversion server, this message is informational only. No action is required on your part.\n";
+            $addendum = "cPanel only supports up to PHP 5.5 at this time. Since we cannot change the version of PHP to match that of the $src_panel_noversion server, this message is informational only. No action is required on your part.\n";
         }
-        elsif ( $src_php_minor == 3 and $dst_php_minor == 4 ) {
+        elsif ( $src_php_minor == 4 and $dst_php_minor > 4 ) {
             $print_message = 1;
             $addendum  = "The versions of PHP do not match. This is ok, but some sites may not be compatible with different versions of PHP.\n\n";
-            $addendum .= "cPanel supports PHP 5.2, 5.3, and  5.4 at this time.\n\n";
-            $addendum .= "For maximum compatibility, I would recommend downgrading to PHP 5.3 on the cPanel server. This is not required, however.\n\n";
+            $addendum .= "cPanel supports PHP $supported_php_versions at this time.\n\n";
+            $addendum .= "For maximum compatibility, I would recommend downgrading to PHP 5.4 on the cPanel server. This is not required, however.\n\n";
             $addendum .= "Would you like us to downgrade PHP on the cPanel server to ${src_php}?\n\n";
             $addendum .= "[ ] YES   [ ] NO\n";
         }
-        elsif ( $src_php_minor == 2 and $dst_php_minor == 4 ) {
+        elsif ( $src_php_minor == 3 and $dst_php_minor > 3 ) {
             $print_message = 1;
             $addendum  = "The versions of PHP do not match. This is ok, but some sites may not be compatible with different versions of PHP.\n\n";
-            $addendum .= "cPanel supports PHP 5.2, 5.3, and  5.4 at this time.\n\n";
-            $addendum .= "For maximum compatibility, I would recommend downgrading to PHP 5.2 on the cPanel server. This is not required, however.\n\n";
+            $addendum .= "cPanel supports PHP $supported_php_versions at this time.\n\n";
+            $addendum .= "For maximum compatibility, I would recommend downgrading to PHP 5.3 on the cPanel server. This is not required, however.\n\n";
             $addendum .= "Would you like us to downgrade PHP on the cPanel server to ${src_php}?\n\n";
             $addendum .= "[ ] YES   [ ] NO\n";
         }
@@ -1633,19 +1635,19 @@ sub print_parsed_php_info {
             if ( $dst_php_major == 5 and $dst_php_minor < 4 ) {
                 $print_message = 1; 
                 $addendum  = "The versions of PHP do not match. This is ok, but some sites may not be compatible with different versions of PHP.\n\n";
-                $addendum .= "cPanel supports PHP 5.2, 5.3, and  5.4 at this time.\n\n";
+                $addendum .= "cPanel supports PHP $supported_php_versions at this time.\n\n";
                 $addendum .= "For maximum compatibility, I would recommend upgrading PHP 5.4 on the cPanel server. This is not required, however.\n\n";
                 $addendum .= "Would you like us to upgrade PHP on the cPanel server to ${src_php}?\n\n";
                 $addendum .= "[ ] YES   [ ] NO\n";
             }
         }
+    }
 
-        if ( $print_message == 1 ) {
-            print_header('PHP Versions');
-            print "${src_panel_noversion}: $src_php\n";
-            print "cPanel: $dst_php\n";
-            print "\n$addendum\n";
-        }
+    if ( $print_message == 1 ) {
+        print_header('PHP Versions');
+        print "${src_panel_noversion}: $src_php\n";
+        print "cPanel: $dst_php\n";
+        print "\n$addendum\n";
     }
 }
 
