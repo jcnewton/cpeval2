@@ -1580,14 +1580,6 @@ sub parse_output_file {
             push @sites_on_dedicated_ipaddrs, $1;
         }
 
-        ## Disk usage info
-        if ( m{ ( \A $panel_regex:DISK_SPACE:\d+:\d+:\S+) }xms ) {
-            push @src_disk_usage, $1;
-        }
-        elsif ( m{ ( \A d:DISK_SPACE:\d+:\d+:\S+) }xms ) {
-            push @dst_disk_usage, $1;
-        }
-
         ## Forwarding domains
         if ( m{ \A s:(?:Plesk(?:8|9|10|10SMB|11):FORWARDING_DOMAIN:([^:]+):(.*)) }xms ) {
             my ( $forwarding_from, $forwarding_to ) = ( $1, $2 );
