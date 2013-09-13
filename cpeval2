@@ -1737,6 +1737,8 @@ sub print_parsed_mysql_info {
 
         $print_message = 1;
         $addendum = "The $src_panel_noversion server is running MySQL ${src_mysql}. This version is not supported at this time. We can attempt the migration anyway, but you may need to create the databases on the cPanel server, then manually export and import your databases.\n\n";
+        $addendum .= "Would you like us to proceed with the migration anyway?\n\n";
+        $addendum .= "[ ] YES  [ ] NO\n";
 
         if ( $dst_mysql =~ /^4/ ) {
         $addendum .= "The cPanel server is running MySQL 4, which is not supported at this time. Our recommendation would be to upgrade MySQL via WHM >> MySQL Upgrade before we proceed further.\n\n";
