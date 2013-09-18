@@ -1114,6 +1114,10 @@ sub print_custom_php_modules {
         push( @custom, " " . $mod . "\n" ) unless grep ( /^$mod$/, @base );
     }
 
+    if (@custom) {
+        @custom = sort @custom;
+    }
+
     ## TTF (FreeType) check
     my $freetype = `php -i 2>/dev/null | grep -i 'freetype support => enabled'`;
     if ($freetype) {
@@ -1123,9 +1127,6 @@ sub print_custom_php_modules {
     if ( !@custom ) { 
         push( @custom, " -None-\n" );
     }
-    else {
-        @custom = sort @custom;
-    }   
 
     print "Custom PHP Modules:\n";
     for my $module ( @custom ) {
