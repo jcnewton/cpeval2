@@ -1,0 +1,23 @@
+ TODO
+
+ 1) Compare the disk space output, and:
+  a) print to STAFF if a different partition / $tarroot needs to be used
+  b) print to CUSTOMER if there isn't enough free space to do the migration
+  c) print to CUSTOMER if used space is less than half of free space, since
+     the largest account we could copy would be ((used space / largest account ) - a few GB)
+
+ 2) Check for MySQL username conflicts
+
+ 3) Add a PHP handler check - s:Plesk8:PHPHANDLER:dso   d:PHPHANDLER:suphp
+
+ 4) Check for Postgres on both boxes.
+
+ 5) If the source has the snmp PHP module, print a message to install net-snmp-devel on destination
+
+ 6) Check for username.tar.gz files in /home([^/)?/ on destination, which can disrupt a restore
+
+ 7) Check openssh-clients package on source
+
+ 8) Check if any of the domains from the source already exist on the dest
+
+ 9) Fix "NAT Detected!" when NAT check doesn't work due to outbound 80 being blocked
