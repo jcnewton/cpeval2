@@ -19,5 +19,3 @@
  7) Check openssh-clients package on source
 
  8) Check if any of the domains from the source already exist on the dest
-
- 9) Fix "NAT Detected!" when NAT check doesn't work due to outbound 80 being blocked
