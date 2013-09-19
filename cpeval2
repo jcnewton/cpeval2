@@ -975,8 +975,8 @@ sub print_custom_apache_modules {
     my @custom;
 
     # Base installed Apache Modules through EasyApache from a fresh cPanel install as reported by "httpd -l"
-    # Updated: 01/20/2012
-    # Easy::Apache v3.8.5
+    # Last reviewed: 09/19/2013
+    # Cpanel::Easy::Apache v3.22.10 rev9999
     my @base = qw(
         core.c
         mod_authn_file.c
@@ -1021,16 +1021,6 @@ sub print_custom_apache_modules {
         mod_so.c
     );
 
-    # Modules that EasyApache does not support
-    my @ignore = qw(
-        mod_dav.c
-        mod_dav_fs.c
-        mod_dav_lock.c
-    );
-
-    # tack them onto @mods so they're disregarded
-    push @base, @ignore;
-
     my $apachem = `$apache_bin -l 2> /dev/null`;
     $apachem =~ /in modules:\s([^\[]+)[\s]?$/m;
 
@@ -1057,15 +1047,17 @@ sub print_custom_php_modules {
     my @custom;
 
     # Base installed PHP Modules through EasyApache from a fresh cPanel install as reported by "php -m"
-    # Updated: 06/12/2011
-    # Easy::Apache v3.3.6
+    # Updated: 09/19/2013
+    # Cpanel::Easy::Apache v3.22.10 rev9999
     my @base = qw(
         bcmath
         calendar
+        Core
         ctype
         curl
         date
         dom
+        ereg
         filter
         ftp
         hash
@@ -1076,13 +1068,14 @@ sub print_custom_php_modules {
         mysql
         openssl
         pcre
+        Phar
         posix
         Reflection
         session
         SimpleXML
         sockets
         SPL
-        SQLite
+        sqlite3
         standard
         tokenizer
         xml
