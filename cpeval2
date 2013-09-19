@@ -822,15 +822,10 @@ sub get_mysql_auth {
 sub print_postgres_db_count {
    if ( _find_bin( 'psql' ) ) {
         if ( find_psql_socket() ) { 
-            # New Hotness
             if ( my $rawsql = psqlcmd("select datname from pg_database") ) { 
                 if ( $rawsql =~ /^Postgres Fatal/m ) { return "\n$rawsql" }
                 my @alldbs = split( '\n', $rawsql );
                 my @userdbs = grep { !/^(postgres|template[0-1])$/ } @alldbs;
-
-                # Old & Busted.  Keeping around just in case.
-                # my @alldbs = split( '\n', psqlcmd("\\l") );
-                # my @userdbs = grep { !/^(((postgres|template[0-1])\|postgres)|appldb\|root)\|UTF8$/ } @alldbs;
 
                 print_format( 'Postgres DBs', @alldbs . " (" . @userdbs . " User Created)" );
             }
@@ -920,20 +915,6 @@ sub get_psql_auth {
     if ( $is_plesk == 1 or $is_plesk_smb10 == 1 ) {
         my $line = sqlcmd("use psa; SELECT admin_login, admin_password FROM DatabaseServers WHERE type='postgresql'");
         my ( $user, $pass ) = split /\s+/, $line;
-
-        # I can't remember why I added this.  Saving in case I later remember.
-        #my ( $homedir, $uid, $gid ) = ( getpwnam($user) )[ 7, 2, 3 ];
-        #if ( -e $homedir ) {
-        #    if ( !-e "$homedir/.pgpass" ) {
-        #        if ( open( my $fh, '>', "$homedir/.pgpass" ) ) {
-        #            print {$fh} '*:*:*:' . $user . ':' . $pass;
-        #            close($fh);
-        #        }
-        #        chown( $uid, $gid, "$homedir/.pgpass" );
-        #        chmod( 0600, "$homedir/.pgpass" );
-        #    }
-        #}
-
         $data->{'user'} = $user;
         $data->{'pass'} = $pass;
     }
@@ -1020,7 +1001,7 @@ sub print_custom_php_modules {
     my @custom;
 
     # Base installed PHP Modules through EasyApache from a fresh cPanel install as reported by "php -m"
-    # Updated: 09/19/2013
+    # Last updated: 09/19/2013
     # Cpanel::Easy::Apache v3.22.10 rev9999
     my @base = qw(
         bcmath
@@ -1802,9 +1783,6 @@ sub print_parsed_coldfusion_info {
     }
 }
 
-# name  hosttype    target
-# example1.com std_fwd example2.com/
-# example1.com frm_fwd example2.com/
 sub print_htype_fwd {
     return if ( !$is_plesk == 1 and !$is_plesk_smb10 == 1 );
 
@@ -1829,8 +1807,6 @@ sub print_htype_fwd {
 
 }
 
-# name  hosting
-# example.com    none
 sub print_htype_none {
     return if ( !$is_plesk == 1 and !$is_plesk_smb10 == 1 );
 
@@ -1855,19 +1831,6 @@ sub print_htype_none {
 print "\n";
 print '-' x 69 . "\n";
 print "[FB 63783] DO NOT TRY TO COPY ACCOUNTS THAT HAVE INVALID USERNAMES\n" x 3;
-
-if ( $is_cpanel == 1 ) {
-    if ( !-f '/usr/local/cpanel/3rdparty/mb2md/mb2md' and !-f '/usr/local/cpanel/bin/mb2md' ) {
-        print '-' x 69 . "\n\n";
-        print "[FB 64132] /u/l/c/3rdparty/mb2md/mb2md does not exist! mbox conversions will fail!\n";
-        print "* See case 64132 for workaround, or use these steps:\n";
-        print "     mkdir -p /usr/local/cpanel/3rdparty/mb2md/\n";
-        print "     cd /usr/local/cpanel/3rdparty/mb2md/\n";
-        print "     wget http://httpupdate.cpanel.net/cpanelsync/11.34.1.12/cpanel/3rdparty/mb2md/mb2md.bz2\n";
-        print "     bzip2 -d mb2md.bz2\n";
-        print "     chmod 755 mb2md\n";
-    }
-}
 
 unless ( $infile ) {
     print '-' x 69 . "\n";
