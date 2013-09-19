@@ -58,7 +58,7 @@ if ( @ARGV > 1 ) {
     exit;
 }
 
-#print_news();
+print_news();
 
 my $supported_php_versions = '5.2, 5.3, 5.4, and 5.5';
 my $panel_regex = 's:(?:Plesk(?:8|9|10|10SMB|11)|Ensim|DirectAdmin)';
