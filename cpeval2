@@ -177,7 +177,7 @@ sub get_control_panel_and_set_prefix {
                 if ( m{ \A (\d+)\.(\d+)? }xms ) {
                     my $plesk_major_version = $1;
                     my $plesk_minor_version = $2 if $2;
-                    if ($plesk_major_version == 11 and $plesk_minor_version and $plesk_minor_version == 5) {
+                    if ($plesk_major_version == 11 and $plesk_minor_version and $plesk_minor_version >= 5) {
                         print_plesk_version_unsupported( "${plesk_major_version}.${plesk_minor_version}" );
                     }
 
@@ -685,7 +685,7 @@ sub print_dedicated_ipaddrs {
 
 sub print_mysql_db_count {
     my @alldbs = split( "\n", sqlcmd( 'show databases;' ) );
-    my @userdbs = grep { !/^(information_schema|cphulkd|eximstats|horde|leechprotect|mysql|(da_)?roundcube|atmail|admin_appl|psa|phpmyadmin_.+|sitebuilder5)$/ } @alldbs;
+    my @userdbs = grep { !/^(logaholicDB_.+|information_schema|performance_schema|cphulkd|eximstats|horde|leechprotect|mysql|(da_)?roundcube|atmail|admin_appl|psa|phpmyadmin_.+|sitebuilder5)$/ } @alldbs;
     print_format( 'MySQL DBs', @alldbs . " (" . @userdbs . " User Created)" );
 }
 
