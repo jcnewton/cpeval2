@@ -31,8 +31,6 @@ if ( @ARGV > 1 ) {
     exit;
 }
 
-print_news();
-
 my $supported_php_versions = '5.2, 5.3, 5.4, and 5.5';
 my $panel_regex = 's:(?:Plesk(?:8|9|10|10SMB|11)|Ensim|DirectAdmin)';
 
@@ -54,6 +52,7 @@ my ( @hosting_type_forward, @hosting_type_nohosting );
 
 my $has_pgsql = 0;
 
+print_news();
 get_control_panel_and_set_prefix();
 check_for_empty_trueuserdomains();
 verify_mysql_connectivity();
@@ -1847,4 +1846,8 @@ unless ( $infile ) {
     if ( $is_plesk == 1 ) {
         print "  * Plesk stores users' data under /var [ /var/www/vhosts/\${DOMAIN}/ ] [ /var/qmail/mailnames/\${DOMAIN}/ ] [ /var/lib/mysql ]\n";
     }
+}
+
+if ( $is_cpanel == 1 and -f '/var/cpanel/transfers_devel' ) {
+    print "\n\n!! /var/cpanel/transfers_devel exists! Server may be using _DEVEL migrations scripts !!\n";
 }
