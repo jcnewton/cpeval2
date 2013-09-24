@@ -78,6 +78,8 @@ sub print_news {
 4. [FB 73781] 07/23/2013 Ensim: Subdomain data is not always copied correctly.
    - Workaround? NO.
 
+5. [FB 77129] 09/06/2013 updateuserdomains-universal uses deprecated "pass" instead of "password"
+   - Workaround? YES - copy the accounts manually, and not via WHM.
 };
 
     sleep 3;
