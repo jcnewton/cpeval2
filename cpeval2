@@ -49,6 +49,7 @@ my $src_panel;              # Ensim, DirectAdmin, Plesk8, Plesk9, Plesk10, Plesk
 my $src_panel_noversion;    # Ensim, DirectAdmin, Plesk
 
 my ( @hosting_type_forward, @hosting_type_nohosting );
+my @plesk_reseller_username_conflicts;
 
 my $has_pgsql = 0;
 
@@ -118,7 +119,8 @@ if ( !$infile ) {
     print_custom_php_modules();
     print_htype_fwd();
     print_htype_none();
-    print_plesk_duplicate_email_users();
+    print_plesk_duplicate_email_users(); # case 75913 - [Plesk] Copy email accounts with uppercase chars as all lowercase if a matching account does not already exist
+    print_reseller_username_conflicts(); # case 76677 - [Plesk] If a reseller has a domain, copy it instead of making a "psa-reseller-$cpuser.invalid" domain
 
     print "\n" . '-' x 40 . "\n\n";
 
@@ -129,6 +131,7 @@ if ( !$infile ) {
     print_prefixed_hosting_types();
     print_prefixed_tomcat_info();
     print_prefixed_coldfusion_info();
+    print_prefixed_reseller_username_conflicts();
 }
 ## parse output file; this prints info we can just copy/paste into the ticket
 else {
@@ -137,7 +140,7 @@ else {
 
 sub print_header {
     my $text = shift;
-    print "\n" . '=' x 20 . "\n$text\n" . '=' x 20 . "\n";
+    print "\n" . '=' x 40 . "\n$text\n" . '=' x 40 . "\n";
 }
 
 
@@ -1310,6 +1313,14 @@ sub print_prefixed_coldfusion_info {
     }
 }
 
+sub print_prefixed_reseller_username_conflicts {
+    return if !@plesk_reseller_username_conflicts;
+
+    for my $reseller (@plesk_reseller_username_conflicts) {
+        print $prefix . 'RESELLER_CONFLICT:' . $reseller . "\n";
+    }
+}
+
 sub print_plesk_duplicate_email_users {
     return if ( $is_plesk == 0 );
 
@@ -1318,6 +1329,7 @@ sub print_plesk_duplicate_email_users {
 
     my %dupes = ();
     my @duplicate_mail_users;
+    my @output;
 
     ## get list of mail domains
     opendir( my $maildir_fh, $maildir );
@@ -1329,6 +1341,7 @@ sub print_plesk_duplicate_email_users {
 
     ## get list of mail users
     for my $domain (@domains) {
+        my $dupes;
         my $users_dir = "${maildir}/${domain}";
         next if !-d $users_dir;
 
@@ -1342,7 +1355,6 @@ sub print_plesk_duplicate_email_users {
         my %seen;
         grep { !$seen{$_}++ } @lowercase_mailusers;
 
-        my $dupes;
         while (my($k,$v) = each (%seen)) {
             if ($v > 1) {
                 for my $user (@mailusers) {
@@ -1352,9 +1364,46 @@ sub print_plesk_duplicate_email_users {
                 }
             }
         }
+
         if ($dupes) {
             $dupes =~ s/,\s$//g;
-            print "Duplicate email users: $domain ($dupes)\n";
+            $dupes = "[$domain] $dupes";
+            push @output, $dupes;
+        }
+    }
+
+    if (@output) {
+        print "\n\nDuplicate email users:\n";
+        for my $line (@output) {
+            print " $line\n";
+        }
+    }
+}
+
+sub print_reseller_username_conflicts {
+    my @plesk_resellers;
+
+    my @reseller_query = `mysql -BN psa -e 'select login, type from clients'`;
+    for my $line ( @reseller_query ) {
+        chomp $line;
+        if ( $line =~ m{ \A (\S+) \s+ reseller \z }xms ) {
+            push @plesk_resellers, $1;
+        }
+    }
+
+    if (@plesk_resellers) {
+        for my $reseller (@plesk_resellers) {
+            my $test = getpwnam $reseller;
+            if ($test) {
+                push @plesk_reseller_username_conflicts, $reseller;
+            }
+        }
+    }
+
+    if (@plesk_reseller_username_conflicts) {
+        print "\n\nReseller username conflicts:\n";
+        for my $reseller (@plesk_reseller_username_conflicts) {
+            print " $reseller\n";
         }
     }
 }
@@ -1362,7 +1411,7 @@ sub print_plesk_duplicate_email_users {
 sub parse_output_file {
     my $file = shift;
 
-    if ( ! -f $file ) {
+    if ( !-f $file ) {
         die "$file does not exist, or is not a regular file\n";
     }
 
@@ -1387,6 +1436,8 @@ sub parse_output_file {
     my ( $src_tomcat, $dst_tomcat );
 
     my ( $src_coldfusion, $dst_coldfusion );
+
+    my @reseller_username_conflicts;
 
     open my $file_fh, '<', $file or die "Could not open $file: $!\n";
     while ( <$file_fh> ) {
@@ -1480,6 +1531,12 @@ sub parse_output_file {
         if ( m{ \A d:COLDFUSION:0 }xms ) {
             $dst_coldfusion = 0;
         }
+
+        ## Reseller duplicate username conflict
+        # s:Plesk11::RESELLER_CONFLICT:summit
+        if ( m{ \A $panel_regex:RESELLER_CONFLICT:(.*) }xms ) {
+            push @reseller_username_conflicts, $1;
+        }
     }
 
     close $file_fh;
@@ -1499,6 +1556,7 @@ sub parse_output_file {
     print_parsed_nohosting_domain_info( @nohosting_domains );
     print_parsed_tomcat_info( $src_tomcat, $dst_tomcat );
     print_parsed_coldfusion_info( $src_coldfusion, $dst_coldfusion );
+    print_parsed_reseller_username_conflicts( @reseller_username_conflicts );
 
 }
 
@@ -1641,8 +1699,12 @@ sub print_parsed_bad_username_info {
     for my $domain ( sort keys %badusers ) {
         print "${domain}: $badusers{$domain}\n";
     }
-    
-    print "\nWhen renaming the users, please use the following guidelines:\n";
+ 
+    print_username_change_info();
+}
+
+sub print_username_change_info {
+       print "\nWhen renaming the users, please use the following guidelines:\n";
     print q{
 * Use only letters (lowercase only), and numbers if desired
 * Users cannot start with a number, or with the string "test"
@@ -1782,6 +1844,24 @@ sub print_parsed_coldfusion_info {
         print "If your websites require ColdFusion, they will not work if it is not installed.\n";
         print "If you need assistance with installing ColdFusion, you would need to contact your sysadmin.\n";
     }
+}
+
+sub print_parsed_reseller_username_conflicts {
+    my @reseller_username_conflicts = @_;
+    return if !@reseller_username_conflicts;
+
+    @reseller_username_conflicts = sort @reseller_username_conflicts;
+
+    print_header('Reseller Username Conflicts');
+
+    print "Plesk allows duplicate usernames for resellers and system accounts, while cPanel does not.\n";
+    print "As such, the following usernames will need to be renamed before they can be copied:\n\n";
+
+    for my $reseller (@reseller_username_conflicts) {
+        print "* $reseller\n";
+    }
+
+    print_username_change_info();
 }
 
 sub print_htype_fwd {
