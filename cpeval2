@@ -1855,7 +1855,7 @@ sub print_parsed_reseller_username_conflicts {
     print_header('Reseller Username Conflicts');
 
     print "Plesk allows duplicate usernames for resellers and system accounts, while cPanel does not.\n";
-    print "As such, the following usernames will need to be renamed before they can be copied:\n\n";
+    print "As such, the following usernames will need to be renamed to something unique before they can be copied:\n\n";
 
     for my $reseller (@reseller_username_conflicts) {
         print "* $reseller\n";
