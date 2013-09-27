@@ -1381,6 +1381,7 @@ sub print_plesk_duplicate_email_users {
 }
 
 sub print_reseller_username_conflicts {
+    return unless ( $is_plesk == 1 or $is_plesk_smb10 == 1 );
     my @plesk_resellers;
 
     my @reseller_query = `mysql -BN psa -e 'select login, type from clients'`;
