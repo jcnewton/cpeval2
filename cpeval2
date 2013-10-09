@@ -132,6 +132,7 @@ if ( !$infile ) {
     print_prefixed_tomcat_info();
     print_prefixed_coldfusion_info();
     print_prefixed_reseller_username_conflicts();
+    print_prefix_php_memory_limit();
 }
 ## parse output file; this prints info we can just copy/paste into the ticket
 else {
@@ -1321,6 +1322,31 @@ sub print_prefixed_reseller_username_conflicts {
     }
 }
 
+sub print_prefix_php_memory_limit {
+    my $phpini;
+    my $memory_limit;
+
+    if ( $is_plesk == 1 or $is_plesk_smb10 == 1 ) {
+        $phpini = '/etc/php.ini';
+    }
+    elsif ( $is_da == 1 or $is_cpanel == 1 ) {
+        $phpini = '/usr/local/lib/php.ini';
+    }
+
+    return if !-e $phpini;
+
+    open my $file_fh, '<', $phpini;
+    while ( chomp( my $line = <$file_fh> ) ) {
+        if ( $line =~ m{ \A (?:[\s\t]+)? memory_limit (?:[\s\t]+)? = (?:[\s\t]+)? ["']? (\d+)M ['"]? }xms ) {
+            $memory_limit = $1;
+            last;
+        }
+    }
+    close $file_fh;
+
+    print $prefix . 'PHPINI_MEMORY_LIMIT:' . $memory_limit . "\n";
+}
+
 sub print_plesk_duplicate_email_users {
     return if ( $is_plesk == 0 );
 
@@ -1440,6 +1466,8 @@ sub parse_output_file {
 
     my @reseller_username_conflicts;
 
+    my ( $src_phpini_memory_limit, $dst_phpini_memory_limit );
+
     open my $file_fh, '<', $file or die "Could not open $file: $!\n";
     while ( <$file_fh> ) {
         chomp;
@@ -1538,6 +1566,13 @@ sub parse_output_file {
         if ( m{ \A $panel_regex:RESELLER_CONFLICT:(.*) }xms ) {
             push @reseller_username_conflicts, $1;
         }
+
+        if ( m{ \A $panel_regex:PHPINI_MEMORY_LIMIT:(\d+) }xms ) {
+            $src_phpini_memory_limit = $1;
+        }
+        elsif ( m{ \A d:PHPINI_MEMORY_LIMIT:(\d+) }xms ) {
+            $dst_phpini_memory_limit = $1;
+        }
     }
 
     close $file_fh;
@@ -1558,6 +1593,7 @@ sub parse_output_file {
     print_parsed_tomcat_info( $src_tomcat, $dst_tomcat );
     print_parsed_coldfusion_info( $src_coldfusion, $dst_coldfusion );
     print_parsed_reseller_username_conflicts( @reseller_username_conflicts );
+    print_parsed_phpini_memory_limit( $src_phpini_memory_limit, $dst_phpini_memory_limit );
 
 }
 
@@ -1793,7 +1829,7 @@ sub print_parsed_forwarding_domain_info {
 
     print q{
 We cannot transfer the following forwarding domains, as they are not hosting accounts.
-You can add them in WHM >> Setup/Edit Domain Forwarding (this requires an additional IP address on the server if one does not exist already):
+You can add them in WHM >> Setup/Edit Domain Forwarding (this requires just 1 additional IP address on the cPanel server if one does not exist already):
 };
 
     print "\n";
@@ -1863,6 +1899,20 @@ sub print_parsed_reseller_username_conflicts {
     }
 
     print_username_change_info();
+}
+
+sub print_parsed_phpini_memory_limit {
+    my ( $src_phpini_memory_limit, $dst_phpini_memory_limit ) = @_;
+
+    if ( $src_phpini_memory_limit > $dst_phpini_memory_limit ) {
+        print_header('PHP Memory Limit');
+        print "$src_panel_noversion: ${src_phpini_memory_limit}M\ncPanel: ${dst_phpini_memory_limit}M\n\n";
+        print "The php memory limit is higher on the $src_panel_noversion server than the cPanel server.\n";
+        print "This can cause some PHP scripts that require higher memory limits to stop functioning properly.\n";
+        print "May we set the same PHP memory limit on the cPanel server as the $src_panel_noversion server?\n\n";
+        print "[ ] YES  [ ] NO\n";
+    }
+
 }
 
 sub print_htype_fwd {
