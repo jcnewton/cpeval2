@@ -1740,6 +1740,17 @@ sub print_parsed_bad_username_info {
     print_username_change_info();
 }
 
+sub print_reseller_username_change_info {
+    # This has only been tested on Plesk 10, 11, and 11.5.
+     print q{
+1. Log into Plesk as admin
+2. Click "Resellers"
+3. Click the link under the "Reseller Name" column
+4. Click "Change Login Info"
+}
+
+}
+
 sub print_username_change_info {
        print "\nWhen renaming the users, please use the following guidelines:\n";
     print q{
@@ -1898,7 +1909,7 @@ sub print_parsed_reseller_username_conflicts {
         print "* $reseller\n";
     }
 
-    print_username_change_info();
+    print_reseller_username_change_info();
 }
 
 sub print_parsed_phpini_memory_limit {
