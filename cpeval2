@@ -62,25 +62,17 @@ sub print_news {
     print q{
     =======================================================
       LIST OF CRITICAL BUGS THAT PREVENT PROPER TRANSFERS
-             Last updated: September 11th, 2013
+             Last updated: October 10th, 2013
     =======================================================
 
     !! USE _DEVEL OVERRIDE FOR ALL PLESK AND DA TRANSFERS !!
 
-1. [FB 75761] 08/20/2013 Plesk: Not all files/dirs starting with a number are copied.
-   - Workaround? YES - patched in _DEVEL (you must set this up as an override)
-
-2. [FB 69649] 06/04/2013 DirectAdmin: Not all email accounts are copied.
-   - Workaround? YES - patched in _DEVEL (you must set this up as an override)
-
-3. [FB 75865] 08/21/2013 Plesk: Not all Plesk addon domains are copied.
+1. [FB 75865] 08/21/2013 Plesk: Not all Plesk addon domains are copied.
    - Workaround? NO.
 
-4. [FB 73781] 07/23/2013 Ensim: Subdomain data is not always copied correctly.
+2. [FB 73781] 07/23/2013 Ensim: Subdomain data is not always copied correctly.
    - Workaround? NO.
 
-5. [FB 77129] 09/06/2013 updateuserdomains-universal uses deprecated "pass" instead of "password"
-   - Workaround? YES - copy the accounts manually, and not via WHM.
 };
 
     sleep 3;
@@ -1973,7 +1965,7 @@ sub print_htype_none {
 
 print "\n";
 print '-' x 69 . "\n";
-print "[FB 63783] DO NOT TRY TO COPY ACCOUNTS THAT HAVE INVALID USERNAMES\n" x 3;
+print "[FB 63783] (Filed 2/26/13, in _DEVEL 10/10/13) DO NOT TRY TO COPY ACCOUNTS THAT HAVE INVALID USERNAMES\n" x 3;
 
 unless ( $infile ) {
     print '-' x 69 . "\n";
