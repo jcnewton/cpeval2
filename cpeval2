@@ -65,8 +65,6 @@ sub print_news {
              Last updated: October 10th, 2013
     =======================================================
 
-    !! USE _DEVEL OVERRIDE FOR ALL PLESK AND DA TRANSFERS !!
-
 1. [FB 75865] 08/21/2013 Plesk: Not all Plesk addon domains are copied.
    - Workaround? NO.
 
