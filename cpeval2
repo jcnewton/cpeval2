@@ -1326,7 +1326,7 @@ sub print_prefix_php_memory_limit {
     my $phpini;
     my $memory_limit;
 
-    if ( $is_plesk == 1 or $is_plesk_smb10 == 1 ) {
+    if ( $is_plesk == 1 or $is_plesk_smb10 == 1 or $is_ensim == 1 ) {
         $phpini = '/etc/php.ini';
     }
     elsif ( $is_da == 1 or $is_cpanel == 1 ) {
